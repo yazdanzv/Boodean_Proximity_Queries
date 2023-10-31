@@ -45,6 +45,7 @@ htmlcov/
 .cache
 .idea/
 .idea/*
+Documents
 nosetests.xml
 coverage.xml
 *.cover
