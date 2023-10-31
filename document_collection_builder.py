@@ -54,6 +54,6 @@ for i, sentence in enumerate(sentences, start=1):
         index = f"0{i}"
     else:
         index = str(i)
-    file_name = f".\\Documents\\doc{index}"
+    file_name = f".\\Documents\\doc{index}.txt"
     with open(file_name, "w") as file:
         file.write(sentence)
