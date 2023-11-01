@@ -22,7 +22,7 @@ class PreProcess:
         self.stemmed_tokens = []
         self.lemmatized_tokens = []
         self.load_docs()
-        self.start()
+        self.start_without_elimination()
 
     def load_docs(self):
         # Loop through the files in the directory
@@ -70,7 +70,7 @@ class PreProcess:
             lemmatized_words_list.append(lemmatized_words)
         self.tokens = copy.deepcopy(lemmatized_words_list)
 
-    def start(self):
+    def start_without_elimination(self):
         for i in range(len(self.docs)):
             self.docs[i] = self.case_folding(self.docs[i])  # Handle Upper cases
             self.docs[i] = self.special_characters_remover(self.docs[i])  # Eliminate Special Characters
@@ -79,6 +79,21 @@ class PreProcess:
         print(self.tokens)
         print(len(self.tokens))
         self.stop_word_remover()
+        print(self.tokens)
+        print(len(self.tokens))
+        self.stemming()
+        print(self.tokens)
+        print(len(self.tokens))
+        self.lemmatization()
+        print(self.tokens)
+        print(len(self.tokens))
+
+    def start(self):
+        for i in range(len(self.docs)):
+            self.docs[i] = self.case_folding(self.docs[i])  # Handle Upper cases
+            self.docs[i] = self.special_characters_remover(self.docs[i])  # Eliminate Special Characters
+        self.tokenize()
+        print(self.docs)
         print(self.tokens)
         print(len(self.tokens))
         self.stemming()
