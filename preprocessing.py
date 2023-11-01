@@ -8,7 +8,7 @@ class PreProcess:
         self.docs = []
         self.load_docs()
         self.start()
-        print(self.load_docs())
+        print(self.docs)
 
     def load_docs(self):
         # Loop through the files in the directory
@@ -20,27 +20,25 @@ class PreProcess:
                     self.docs.append(text)
 
     @staticmethod
-    def case_folding(text: str):
+    def case_folding(text: str):  # Lower case all the existing characters in the documents
         return text.lower()
 
     @staticmethod
-    def special_characters_remover(text: str):
+    def special_characters_remover(text: str):  # Eliminates all the special characters like {, . : ; }
         normalized_text = re.sub(r'[^\w\s]', '', text)
         return normalized_text
 
-    def tokenizing(self):
+    def stemming(self):
         pass
-
-    def non_alphabetic_remover(self):
-        pass
+    pass
 
     def stop_word_remover(self):
         pass
 
-    def stemming(self):
+    def lemmatization(self):
         pass
 
-    def lemmatization(self):
+    def tokenizing(self):
         pass
 
     def start(self):
