@@ -1,15 +1,17 @@
 import os
 import re
 import copy
-import nltk
-# nltk.download('stopwords')
-# nltk.download('punkt')
-# nltk.download('wordnet')
-# nltk.download('omw-1.4')
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from nltk.stem import WordNetLemmatizer
+
+
+# import nltk
+# nltk.download('stopwords')
+# nltk.download('punkt')
+# nltk.download('wordnet')
+# nltk.download('omw-1.4')
 
 
 class PreProcess:
@@ -21,7 +23,6 @@ class PreProcess:
         self.lemmatized_tokens = []
         self.load_docs()
         self.start()
-
 
     def load_docs(self):
         # Loop through the files in the directory
@@ -86,6 +87,3 @@ class PreProcess:
         self.lemmatization()
         print(self.tokens)
         print(len(self.tokens))
-
-
-a = PreProcess()
