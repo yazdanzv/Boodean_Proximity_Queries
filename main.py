@@ -1,5 +1,6 @@
 from preprocessing import PreProcess
 from building_inverted_index import Inverted_Index_Builder
+
 a = PreProcess()
 b = Inverted_Index_Builder(a.tokens_with_elimination)
 b.build_optimized()
