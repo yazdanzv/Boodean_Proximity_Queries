@@ -1,3 +1,4 @@
+# Goal of this file is to build the document collection in a desired directory
 import os
 
 # Create a directory to store the text files
@@ -5,6 +6,7 @@ if not os.path.exists(".\\Documents"):
     os.mkdir(".\\Documents")
 
 # List of 40 sentences
+# You can replace it with your desired sentences
 sentences = [
     "The quick brown fox jumps over the lazy dog.",
     "In the heart of the city, a bustling marketplace comes to life.",
@@ -48,7 +50,7 @@ sentences = [
     "In the heart of the city, diverse cultures converge, celebrating unity and cultural exchange."
 ]
 
-# Create and write sentences to 40 text files
+# Create and write sentences to 40 text files or any desired number of sentences
 for i, sentence in enumerate(sentences, start=1):
     if i < 10:
         index = f"0{i}"
