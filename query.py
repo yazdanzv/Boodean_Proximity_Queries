@@ -3,10 +3,11 @@ from nltk.stem import WordNetLemmatizer
 
 
 class Query:
-    def __init__(self, query: str, inverted_index_with_elimination: list, inverted_index_without_elimination: list):
+    def __init__(self, query: str, inverted_index_with_elimination: list, inverted_index_without_elimination: list, doc_numbers: int):
         self.query = query
         self.inverted_index_with_elimination = inverted_index_with_elimination
         self.inverted_index_without_elimination = inverted_index_without_elimination
+        self.docs_number = doc_numbers
         self.query_state = ""
         self.boolean_operators = ['AND', 'OR', 'NOT']
         self.terms = []
@@ -19,9 +20,13 @@ class Query:
         stemmer = PorterStemmer()
         lemmatizer = WordNetLemmatizer()
         terms = self.query.split(" ")
-        self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms[0]), pos='v'))
-        self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms[-1]), pos='v'))
-        self.operator = terms[1]
+        if len(terms) == 3:
+            self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms[0]), pos='v'))
+            self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms[-1]), pos='v'))
+            self.operator = terms[1]
+        elif len(terms) == 2:
+            self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms[1]), pos='v'))
+            self.operator = terms[0]  # Equal to NOT
 
     def state_determiner(self):
         if self.operator in self.boolean_operators:
@@ -48,12 +53,17 @@ class Query:
                 term2_keys = list(term2_info.keys())
                 result = list(set(term1_keys + term2_keys))
                 return result
-            elif operator_state == 'NOT':
+            elif operator_state == 'NOT' and len(self.terms) == 2:
                 term1_info = self.inverted_index_with_elimination[self.terms[0]]
                 term2_info = self.inverted_index_with_elimination[self.terms[1]]
                 term1_keys = term1_info.keys()
                 term2_keys = term2_info.keys()
                 result = [doc_id for doc_id in term1_keys if doc_id not in term2_keys]
+                return result
+            elif operator_state == 'NOT' and len(self.terms) == 1:
+                term1_info = self.inverted_index_with_elimination[self.terms[0]]
+                term1_keys = term1_info.keys()
+                result = [doc_id for doc_id in range(self.docs_number) if doc_id not in term1_keys]
                 return result
             else:
                 raise Exception("Wrong Operator")
@@ -78,6 +88,11 @@ class Query:
                 term1_keys = term1_info.keys()
                 term2_keys = term2_info.keys()
                 result = [doc_id for doc_id in term1_keys if doc_id not in term2_keys]
+                return result
+            elif operator_state == 'NOT' and len(self.terms) == 1:
+                term1_info = self.inverted_index_without_elimination[self.terms[0]]
+                term1_keys = term1_info.keys()
+                result = [doc_id for doc_id in range(self.docs_number) if doc_id not in term1_keys]
                 return result
             else:
                 raise Exception("Wrong Operator")
@@ -104,7 +119,8 @@ class Query:
             term2_indexes = term2_info[doc_id]['indexes']
             for i in range(len(term1_indexes)):
                 for j in range(len(term2_indexes)):
-                    if term1_indexes[i] in range(term2_indexes[j] - area_covered - 1, term2_indexes[j] + area_covered + 2):
+                    if term1_indexes[i] in range(term2_indexes[j] - area_covered - 1,
+                                                 term2_indexes[j] + area_covered + 2):
                         result.append(doc_id)
         return result
 
