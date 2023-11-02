@@ -1,3 +1,7 @@
+from nltk.stem import PorterStemmer
+from nltk.stem import WordNetLemmatizer
+
+
 class Query:
     def __init__(self, query: str, inverted_index_with_elimination: list, inverted_index_without_elimination: list):
         self.query = query
@@ -7,11 +11,16 @@ class Query:
         self.boolean_operators = ['AND', 'OR', 'NOT']
         self.terms = []
         self.operator = ""
+        self.query_opener()
+        self.state_determiner()
+        self.start()
 
     def query_opener(self):
+        stemmer = PorterStemmer()
+        lemmatizer = WordNetLemmatizer()
         terms = self.query.split(" ")
-        self.terms.append(terms[0])
-        self.terms.append([terms[-1]])
+        self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms[0]), pos='v'))
+        self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms[-1]), pos='v'))
         self.operator = terms[1]
 
     def state_determiner(self):
@@ -35,8 +44,8 @@ class Query:
             elif operator_state == 'OR':
                 term1_info = self.inverted_index_with_elimination[self.terms[0]]
                 term2_info = self.inverted_index_with_elimination[self.terms[1]]
-                term1_keys = term1_info.keys()
-                term2_keys = term2_info.keys()
+                term1_keys = list(term1_info.keys())
+                term2_keys = list(term2_info.keys())
                 result = list(set(term1_keys + term2_keys))
                 return result
             elif operator_state == 'NOT':
@@ -75,17 +84,18 @@ class Query:
 
     def start_boolean_query(self):
         if self.operator == 'AND':
-            self.boolean_search(operator_state='AND', state=True)
+            print(self.boolean_search(operator_state='AND', state=True))
         elif self.operator == 'OR':
-            self.boolean_search(operator_state='OR', state=True)
+            print(self.boolean_search(operator_state='OR', state=True))
         elif self.operator == 'NOT':
-            self.boolean_search(operator_state='NOT', state=True)
+            print(self.boolean_search(operator_state='NOT', state=True))
         else:
             raise Exception("Not a Valid Operator")
 
     def proximity_search(self):
         area_covered = int(self.operator.split('/')[-1])  # The number we passed into the proximity query
-        doc_ids = self.boolean_search(operator_state='AND', state=False)  # To get the doc ids that contains both of terms
+        doc_ids = self.boolean_search(operator_state='AND',
+                                      state=False)  # To get the doc ids that contains both of terms
         result = []
         term1_info = self.inverted_index_without_elimination[self.terms[0]]
         term2_info = self.inverted_index_without_elimination[self.terms[1]]
@@ -94,6 +104,17 @@ class Query:
             term2_indexes = term2_info[doc_id]['indexes']
             for i in range(len(term1_indexes)):
                 for j in range(len(term2_indexes)):
-                    if i in range(j-area_covered, j+area_covered+1):
+                    if term1_indexes[i] in range(term2_indexes[j] - area_covered - 1, term2_indexes[j] + area_covered + 2):
                         result.append(doc_id)
         return result
+
+    def start_proximity_search(self):
+        print(self.proximity_search())
+
+    def start(self):
+        if self.query_state == 'boolean':
+            self.start_boolean_query()
+        elif self.query_state == 'proximity':
+            self.start_proximity_search()
+        else:
+            raise Exception('Not a Valid Query State')
