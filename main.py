@@ -21,9 +21,9 @@ print(c.inverted_index_optimized)
 print(c.inverted_index)
 print("******************************************************")
 #  You can see all the queries that this IR system can handle and it can actually handle two ways of NOT query
-q1 = Query('heart AND city', b.inverted_index_optimized, c.inverted_index_optimized, len(a.docs))
-q2 = Query('heart OR city', b.inverted_index_optimized, c.inverted_index_optimized, len(a.docs))
-q3 = Query('heart NOT city', b.inverted_index_optimized, c.inverted_index_optimized, len(a.docs))  # NOT query type one
-q4 = Query('NOT city', b.inverted_index_optimized, c.inverted_index_optimized, len(a.docs))  # NOT query type two
-q5 = Query('hear NEAR/3 city', b.inverted_index_optimized, c.inverted_index_optimized, len(a.docs))
+q1 = Query('heart AND cty', b.inverted_index_optimized, c.inverted_index_optimized, len(a.docs), a.terms, a.terms_edited)
+# q2 = Query('heart OR city', b.inverted_index_optimized, c.inverted_index_optimized, len(a.docs), a.terms, a.terms_edited)
+# q3 = Query('heart NOT city', b.inverted_index_optimized, c.inverted_index_optimized, len(a.docs), a.terms, a.terms_edited)  # NOT query type one
+# q4 = Query('NOT city', b.inverted_index_optimized, c.inverted_index_optimized, len(a.docs), a.terms, a.terms_edited)  # NOT query type two
+# q5 = Query('heart NEAR/3 city', b.inverted_index_optimized, c.inverted_index_optimized, len(a.docs), a.terms, a.terms_edited)
 

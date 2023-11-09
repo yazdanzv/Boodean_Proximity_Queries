@@ -1,10 +1,11 @@
 from nltk.stem import PorterStemmer
 from nltk.stem import WordNetLemmatizer
+from miss_spelling import MissSpell
 
 
 class Query:
     def __init__(self, query: str, inverted_index_with_elimination: list, inverted_index_without_elimination: list,
-                 doc_numbers: int):  # Get Both Optimized Inverted Indexes, WITH and WITHOUT elimination and the number of documents
+                 doc_numbers: int, terms: list, terms_edited: list):  # Get Both Optimized Inverted Indexes, WITH and WITHOUT elimination and the number of documents
         self.query = query  # The query the user entered
         self.inverted_index_with_elimination = inverted_index_with_elimination  # Inverted Index WITH elimination
         self.inverted_index_without_elimination = inverted_index_without_elimination  # Inverted Index WITHOUT elimination
@@ -13,6 +14,8 @@ class Query:
         self.boolean_operators = ['AND', 'OR', 'NOT']  # Boolean operators that we can handle
         self.terms = []  # List to keep terms or term in it (For one of the types of NOT query we have one term)
         self.operator = ""  # Operator keeper
+        self.all_terms = terms
+        self.all_terms_edited = terms_edited
         self.query_opener()
         self.state_determiner()
         self.start()
@@ -22,11 +25,17 @@ class Query:
         lemmatizer = WordNetLemmatizer()  # Doing Lemmatization before doing the query
         terms = self.query.split(" ")
         if len(terms) == 3:  # For another queries
-            self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms[0]), pos='v'))
-            self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms[-1]), pos='v'))
+            terms_not_edited = [terms[0], terms[2]]
+            if self.miss_spell_detector(terms_not_edited):
+                terms_not_edited = self.miss_spell_handler(terms_not_edited)
+            self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms_not_edited[0]), pos='v'))
+            self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms_not_edited[-1]), pos='v'))
             self.operator = terms[1]
         elif len(terms) == 2:  # For NOT query with one term
-            self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms[1]), pos='v'))
+            terms_not_edited = [terms[0]]
+            if self.miss_spell_detector(terms_not_edited):
+                terms_not_edited = self.miss_spell_handler(terms_not_edited)
+            self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms_not_edited[1]), pos='v'))
             self.operator = terms[0]  # Equal to NOT
 
     def state_determiner(self):  # Defines the state of the query, it can be boolean or proximity
@@ -131,6 +140,18 @@ class Query:
 
     def start_proximity_search(self):  # Start method for proximity query
         print(self.proximity_search())
+
+    def miss_spell_detector(self, terms):
+        for i in range(len(terms)):
+            if terms[i] not in self.all_terms:
+                return True
+        return False
+
+    def miss_spell_handler(self, terms):
+        for i in range(len(terms)):
+            obj = MissSpell(terms[i], self.all_terms)
+            terms[i] = obj.selected_term
+        return terms
 
     def start(self):  # Start method of the query that can handle which start method we need
         if self.query_state == 'boolean':

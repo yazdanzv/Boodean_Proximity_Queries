@@ -23,6 +23,8 @@ class PreProcess:
         self.tokens_without_elimination = []  # list with tokens of the sentences WITHOUT elimination of some terms
         self.stemmed_tokens = []  # Tokens after stemming
         self.lemmatized_tokens = []  # Tokens after lemmatization
+        self.terms = []  # To get all the terms
+        self.terms_edited = []  # To get all the terms with applied editing
         self.load_docs()
         self.start_with_elimination()
         self.start_without_elimination()
@@ -108,6 +110,18 @@ class PreProcess:
         print(self.tokens_with_elimination)
         print(len(self.tokens_with_elimination))
 
+    def get_terms(self, state: bool):
+        if state:  # To get terms without applying stemmer and lemmatization
+            terms = []
+            for i in range(len(self.tokens_without_elimination)):
+                terms.extend(self.tokens_without_elimination[i])
+            self.terms = copy.deepcopy(list(set(terms)))
+        else:  # To get terms with applying stemmer and lemmatization
+            terms_edited = []
+            for i in range(len(self.tokens_without_elimination)):
+                terms_edited.extend(self.tokens_without_elimination[i])
+            self.terms_edited = copy.deepcopy(list(set(terms_edited)))
+
     def start_without_elimination(self):  # Start method for tokenizing and pre-processing on list WITHOUT elimination
         for i in range(len(self.docs)):
             self.docs[i] = self.case_folding(self.docs[i])  # Handle Upper cases
@@ -117,9 +131,15 @@ class PreProcess:
         print(self.docs)
         print(self.tokens_without_elimination)
         print(len(self.tokens_without_elimination))
+        self.get_terms(state=True)  # To get terms without applying stemmer and lemmatization
+        print("Terms not edited")
+        print(self.terms)
         self.stemming(False)
         print(self.tokens_without_elimination)
         print(len(self.tokens_without_elimination))
         self.lemmatization(False)
         print(self.tokens_without_elimination)
         print(len(self.tokens_without_elimination))
+        self.get_terms(state=False)  # To get terms with applying stemmer and lemmatization
+        print("Terms edited")
+        print(self.terms_edited)
