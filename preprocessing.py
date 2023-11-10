@@ -96,19 +96,9 @@ class PreProcess:
             self.docs[i] = self.case_folding(self.docs[i])  # Handle Upper cases
             self.docs[i] = self.special_characters_remover(self.docs[i])  # Eliminate Special Characters
         self.tokenize(True)
-        print("With Elimination :")
-        print(self.docs)
-        print(self.tokens_with_elimination)
-        print(len(self.tokens_with_elimination))
         self.stop_word_remover()
-        print(self.tokens_with_elimination)
-        print(len(self.tokens_with_elimination))
         self.stemming(True)
-        print(self.tokens_with_elimination)
-        print(len(self.tokens_with_elimination))
         self.lemmatization(True)
-        print(self.tokens_with_elimination)
-        print(len(self.tokens_with_elimination))
 
     def get_terms(self, state: bool):  # Method to get all the terms inside the document collection
         if state:  # To get terms without applying stemmer and lemmatization
@@ -127,19 +117,7 @@ class PreProcess:
             self.docs[i] = self.case_folding(self.docs[i])  # Handle Upper cases
             self.docs[i] = self.special_characters_remover(self.docs[i])  # Eliminate Special Characters
         self.tokenize(False)
-        print("Without Elimination :")
-        print(self.docs)
-        print(self.tokens_without_elimination)
-        print(len(self.tokens_without_elimination))
         self.get_terms(state=True)  # To get terms without applying stemmer and lemmatization
-        print("Terms not edited")
-        print(self.terms)
         self.stemming(False)
-        print(self.tokens_without_elimination)
-        print(len(self.tokens_without_elimination))
         self.lemmatization(False)
-        print(self.tokens_without_elimination)
-        print(len(self.tokens_without_elimination))
         self.get_terms(state=False)  # To get terms with applying stemmer and lemmatization
-        print("Terms edited")
-        print(self.terms_edited)
