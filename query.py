@@ -8,7 +8,8 @@ from wild_card import WildCard
 
 class Query:
     def __init__(self, query: str, inverted_index_with_elimination: list, inverted_index_without_elimination: list,
-                 doc_numbers: int, terms: list, terms_edited: list):  # Get Both Optimized Inverted Indexes, WITH and WITHOUT elimination and the number of documents
+                 doc_numbers: int, terms: list,
+                 terms_edited: list):  # Get Both Optimized Inverted Indexes, WITH and WITHOUT elimination and the number of documents
         self.query = query  # The query the user entered
         self.inverted_index_with_elimination = inverted_index_with_elimination  # Inverted Index WITH elimination
         self.inverted_index_without_elimination = inverted_index_without_elimination  # Inverted Index WITHOUT elimination
@@ -17,8 +18,8 @@ class Query:
         self.boolean_operators = ['AND', 'OR', 'NOT']  # Boolean operators that we can handle
         self.terms = []  # List to keep terms or term in it (For one of the types of NOT query we have one term)
         self.operator = ""  # Operator keeper
-        self.all_terms = terms
-        self.all_terms_edited = terms_edited
+        self.all_terms = terms  # All terms in the document collection
+        self.all_terms_edited = terms_edited  # All terms that are edited (e.g. stemmer) in document collection in case I need later
         self.query_opener()
         self.state_determiner()
         self.start()
@@ -28,29 +29,31 @@ class Query:
         lemmatizer = WordNetLemmatizer()  # Doing Lemmatization before doing the query
         terms = self.query.split(" ")
         if len(terms) == 3:  # For another queries
-            terms_not_edited = [terms[0], terms[2]]
-            if '*' in terms_not_edited[0] or '*' in terms_not_edited[1]:
-                if '*' in terms_not_edited[0]:
-                    a = WildCard(terms_not_edited[0], self.all_terms)
+            terms_not_edited = [terms[0], terms[2]]  # Separate terms
+            if '*' in terms_not_edited[0] or '*' in terms_not_edited[1]:  # Check for wildcard query
+                if '*' in terms_not_edited[0]:  # Check wildcard query in first term
+                    a = WildCard(terms_not_edited[0], self.all_terms)  # Get the best term
                     terms_not_edited[0] = copy.deepcopy(a.selected_term)
-                if '*' in terms_not_edited[1]:
-                    a = WildCard(terms_not_edited[1], self.all_terms)
+                if '*' in terms_not_edited[1]:  # Check wildcard query in second term
+                    a = WildCard(terms_not_edited[1], self.all_terms)  # Get the best term
                     terms_not_edited[1] = copy.deepcopy(a.selected_term)
-            if self.miss_spell_detector(terms_not_edited):
-                terms_not_edited = self.miss_spell_handler(terms_not_edited)
+            if self.miss_spell_detector(
+                    terms_not_edited):  # Check for miss spelling, if this term does not exist iin our term collection
+                terms_not_edited = self.miss_spell_handler(terms_not_edited)  # Correct Spelling
             self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms_not_edited[0]), pos='v'))
             self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms_not_edited[-1]), pos='v'))
             self.operator = terms[1]
         elif len(terms) == 2:  # For NOT query with one term
             terms_not_edited = [terms[0]]
-            if '*' in terms_not_edited[0]:
-                if '*' in terms_not_edited[0]:
-                    a = WildCard(terms_not_edited[0], self.all_terms)
+            if '*' in terms_not_edited[0]:  # Check for wildcard query
+                if '*' in terms_not_edited[0]:  # Check wildcard query in first term
+                    a = WildCard(terms_not_edited[0], self.all_terms)  # Get the best term
                     terms_not_edited[0] = copy.deepcopy(a.selected_term)
-            if self.miss_spell_detector(terms_not_edited):
-                terms_not_edited = self.miss_spell_handler(terms_not_edited)
+            if self.miss_spell_detector(terms_not_edited):  # Check for miss spelling, if this term does not exist iin our term collection
+                terms_not_edited = self.miss_spell_handler(terms_not_edited)  # Correct Spelling
             self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms_not_edited[1]), pos='v'))
             self.operator = terms[0]  # Equal to NOT
+        #  Results on final terms from query
         print("Final Terms : ")
         print(self.terms)
 

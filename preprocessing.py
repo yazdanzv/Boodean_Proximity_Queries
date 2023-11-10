@@ -110,7 +110,7 @@ class PreProcess:
         print(self.tokens_with_elimination)
         print(len(self.tokens_with_elimination))
 
-    def get_terms(self, state: bool):
+    def get_terms(self, state: bool):  # Method to get all the terms inside the document collection
         if state:  # To get terms without applying stemmer and lemmatization
             terms = []
             for i in range(len(self.tokens_without_elimination)):
