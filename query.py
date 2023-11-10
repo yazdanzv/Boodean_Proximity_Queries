@@ -44,14 +44,14 @@ class Query:
             self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms_not_edited[-1]), pos='v'))
             self.operator = terms[1]
         elif len(terms) == 2:  # For NOT query with one term
-            terms_not_edited = [terms[0]]
+            terms_not_edited = [terms[1]]
             if '*' in terms_not_edited[0]:  # Check for wildcard query
                 if '*' in terms_not_edited[0]:  # Check wildcard query in first term
                     a = WildCard(terms_not_edited[0], self.all_terms)  # Get the best term
                     terms_not_edited[0] = copy.deepcopy(a.selected_term)
             if self.miss_spell_detector(terms_not_edited):  # Check for miss spelling, if this term does not exist iin our term collection
                 terms_not_edited = self.miss_spell_handler(terms_not_edited)  # Correct Spelling
-            self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms_not_edited[1]), pos='v'))
+            self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms_not_edited[0]), pos='v'))
             self.operator = terms[0]  # Equal to NOT
         #  Results on final terms from query
         print("Final Terms : ")
