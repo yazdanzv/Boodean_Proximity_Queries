@@ -1,6 +1,9 @@
+import copy
+
 from nltk.stem import PorterStemmer
 from nltk.stem import WordNetLemmatizer
 from miss_spelling import MissSpell
+from wild_card import WildCard
 
 
 class Query:
@@ -26,6 +29,13 @@ class Query:
         terms = self.query.split(" ")
         if len(terms) == 3:  # For another queries
             terms_not_edited = [terms[0], terms[2]]
+            if '*' in terms_not_edited[0] or '*' in terms_not_edited[1]:
+                if '*' in terms_not_edited[0]:
+                    a = WildCard(terms_not_edited[0], self.all_terms)
+                    terms_not_edited[0] = copy.deepcopy(a.selected_term)
+                if '*' in terms_not_edited[1]:
+                    a = WildCard(terms_not_edited[1], self.all_terms)
+                    terms_not_edited[1] = copy.deepcopy(a.selected_term)
             if self.miss_spell_detector(terms_not_edited):
                 terms_not_edited = self.miss_spell_handler(terms_not_edited)
             self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms_not_edited[0]), pos='v'))
@@ -33,10 +43,16 @@ class Query:
             self.operator = terms[1]
         elif len(terms) == 2:  # For NOT query with one term
             terms_not_edited = [terms[0]]
+            if '*' in terms_not_edited[0]:
+                if '*' in terms_not_edited[0]:
+                    a = WildCard(terms_not_edited[0], self.all_terms)
+                    terms_not_edited[0] = copy.deepcopy(a.selected_term)
             if self.miss_spell_detector(terms_not_edited):
                 terms_not_edited = self.miss_spell_handler(terms_not_edited)
             self.terms.append(lemmatizer.lemmatize(stemmer.stem(terms_not_edited[1]), pos='v'))
             self.operator = terms[0]  # Equal to NOT
+        print("Final Terms : ")
+        print(self.terms)
 
     def state_determiner(self):  # Defines the state of the query, it can be boolean or proximity
         if self.operator in self.boolean_operators:
