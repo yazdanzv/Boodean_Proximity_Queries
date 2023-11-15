@@ -1,5 +1,5 @@
 import copy
-import re
+import re  # talked with TA about it
 from Levenshtein import distance
 
 
